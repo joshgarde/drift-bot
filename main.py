@@ -16,7 +16,11 @@ bot = commands.Bot('!')
 
 @bot.event
 async def on_ready():
+    game = nextcord.Game("Running in the '90s")
+    await bot.change_presence(activity=game)
+
     print(f'User: {bot.user.name}#{bot.user.discriminator}')
+    print(f'OAuth URL: https://discord.com/api/oauth2/authorize?client_id={bot.user.id}&permissions=3214336&redirect_uri=https%3A%2F%2Fwww.duckduckgo.com%2F&scope=bot')
     print('Guilds:')
     print('\n'.join([f'  - {guild.name}' for guild in bot.guilds]))
 
