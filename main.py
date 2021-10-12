@@ -12,6 +12,7 @@ from pytube import YouTube
 load_dotenv()
 
 song_list = list(csv.DictReader(open('eurobeat.csv')))
+image_list = list(Path('images').iterdir())
 bot = commands.Bot('!')
 
 @bot.event
@@ -37,7 +38,7 @@ async def eurobeat(ctx):
 
     voice_channel = voice_state.channel
     voice_client = await voice_channel.connect()
-    print(f'Now connected to #{voice_channel.name} on {voice_channel.guild.name}')
+    print(f'Now connected to #{voice_channel.name} on "{voice_channel.guild.name}"')
 
     asyncio.get_event_loop().create_task(__play_next(ctx))
 
@@ -53,6 +54,9 @@ async def drift(ctx):
 
     voice_client.stop()
 
+    file = nextcord.File(open(choice(image_list), 'rb'))
+    await ctx.reply(file=file)
+
 @bot.command()
 async def stopthemusic(ctx):
     if ctx.author.bot:
@@ -63,6 +67,7 @@ async def stopthemusic(ctx):
 
     await ctx.voice_client.disconnect()
     await ctx.reply('https://www.youtube.com/watch?v=sFODclG8mBY')
+
 
 async def __play_next(ctx):
     if ctx.voice_client == None or not ctx.voice_client.is_connected():
@@ -82,6 +87,7 @@ async def __play_next(ctx):
 
     # Jank caching mechanism
     if not download_path.is_file():
+        print(f'Starting download: {download_path}')
         stream.download('downloads')
         print(f'Finished download: {download_path}')
     else:
@@ -95,9 +101,7 @@ async def __play_next(ctx):
     audio_source = await nextcord.FFmpegOpusAudio.from_probe(download_path)
     voice_client.play(audio_source, after=on_after)
 
-    title = random_eurobeat['title']
-    artist = random_eurobeat['artist']
-    print(f'Playing {title} in #{voice_channel.name} on {voice_channel.guild.name}')
+    print(f'Playing "{title}" in #{voice_channel.name} on "{voice_channel.guild.name}"')
     await ctx.send(f'Now playing: {title} by {artist}\n{url}')
 
 if __name__ == '__main__':
