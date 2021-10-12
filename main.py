@@ -66,7 +66,7 @@ async def stopthemusic(ctx):
         return
 
     await ctx.voice_client.disconnect()
-    await ctx.reply('https://www.youtube.com/watch?v=sFODclG8mBY')
+    await ctx.reply('https://www.youtube.com/watch?v=gwKcVEFeJnI')
 
 
 async def __play_next(ctx):
