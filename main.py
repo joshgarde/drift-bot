@@ -77,11 +77,8 @@ async def __play_next(ctx):
     voice_channel = voice_client.channel
 
     random_eurobeat = choice(song_list)
-    title = random_eurobeat['title']
-    artist = random_eurobeat['artist']
-    url = random_eurobeat['url']
-
-    stream = YouTube(url).streams \
+    video = YouTube(random_eurobeat['url'])
+    stream = video.streams \
         .filter(only_audio=True).order_by('abr').desc().first()
     download_path = Path('downloads').joinpath(stream.default_filename)
 
@@ -101,8 +98,17 @@ async def __play_next(ctx):
     audio_source = await nextcord.FFmpegOpusAudio.from_probe(download_path)
     voice_client.play(audio_source, after=on_after)
 
-    print(f'Playing "{title}" in #{voice_channel.name} on "{voice_channel.guild.name}"')
-    await ctx.send(f'Now playing: {title} by {artist}\n{url}')
+    print(f'Playing "{video.title}" in #{voice_channel.name} on "{voice_channel.guild.name}"')
+
+    embed = nextcord.Embed(
+        colour=nextcord.Colour.lighter_grey(),
+        title=random_eurobeat['title'],
+        url=random_eurobeat['url']
+    )
+    embed.set_image(url=video.thumbnail_url)
+    embed.add_field(name='Artist', value=random_eurobeat['artist'])
+    embed.add_field(name='Length', value=f'{video.length // 60}:{video.length % 60:02}')
+    await ctx.send(embed=embed)
 
 if __name__ == '__main__':
     bot.run(os.environ['TOKEN'])
